@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Proyectos</title>
+	<link th:href="@{/css/bootstrap.min.css}" rel="stylesheet">
+</head>
+
+<body class="container">
+
+    <h1>Proyectos</h1>
+
+    <nav>
+        <a th:href="@{/}">Inicio</a> |
+        <a th:href="@{/proyectos}">Proyectos</a> |
+        <a th:href="@{/tareas}">Tareas</a>
+    </nav>
+
+    <hr>
+
+    <h2 th:text="${registroId == null ? 'Nuevo proyecto' : 'Editar proyecto'}"></h2>
+
+    <form th:action="@{/proyectos/guardar}" th:object="${proyecto}" method="post">
+
+        <input type="hidden" name="registroId" th:value="${registroId}">
+
+        <label>Nombre</label>
+        <input class="form-control" th:field="*{nombre}" maxlength="100" required>
+        <p class="text-danger" th:errors="*{nombre}"></p>
+
+        <label>Descripción</label>
+        <textarea class="form-control" th:field="*{descripcion}" maxlength="500"></textarea>
+        <p class="text-danger" th:errors="*{descripcion}"></p>
+
+        <button class="btn btn-primary" type="submit">Guardar</button>
+        <a th:href="@{/proyectos}" th:if="${registroId != null}">Cancelar</a>
+
+    </form>
+
+    <hr>
+
+    <h2>Listado de proyectos</h2>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Nombre</th>
+                <th>Descripción</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr th:each="p : ${proyectos}">
+                <td th:text="${p.id}"></td>
+                <td th:text="${p.nombre}"></td>
+                <td th:text="${p.descripcion}"></td>
+                <td>
+                    <a th:href="@{/proyectos/editar/{id}(id=${p.id})}">Editar</a>
+
+                    <form class="d-inline" method="post" th:action="@{/proyectos/eliminar/{id}(id=${p.id})}"
+                        onsubmit="return confirm('Se eliminará el proyecto y todas sus tareas. ¿Continuar?');">
+
+                        <button class="btn btn-danger" type="submit">Eliminar</button>
+
+                    </form>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+</body>
+
+</html>

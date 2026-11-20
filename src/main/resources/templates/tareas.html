@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Tareas</title>
+	<link th:href="@{/css/bootstrap.min.css}" rel="stylesheet">
+</head>
+
+<body class="container">
+
+    <h1>Tareas</h1>
+
+    <nav>
+        <a th:href="@{/}">Inicio</a> |
+        <a th:href="@{/proyectos}">Proyectos</a> |
+        <a th:href="@{/tareas}">Tareas</a>
+    </nav>
+
+    <hr>
+
+    <h2 th:text="${registroId == null ? 'Nueva tarea' : 'Editar tarea'}"></h2>
+
+    <p th:if="${#lists.isEmpty(proyectos)}">
+        Debes crear un proyecto primero.
+    </p>
+
+    <form th:action="@{/tareas/guardar}" th:object="${tarea}" method="post">
+
+        <input type="hidden" name="registroId" th:value="${registroId}">
+
+        <p class="text-danger" th:each="error : ${#fields.globalErrors()}" th:text="${error}"></p>
+
+        <label>Nombre</label>
+        <input class="form-control" th:field="*{nombre}" maxlength="100" required>
+        <p class="text-danger" th:errors="*{nombre}"></p>
+
+        <label>Descripción</label>
+        <textarea class="form-control" th:field="*{descripcion}" maxlength="500"></textarea>
+        <p class="text-danger" th:errors="*{descripcion}"></p>
+
+        <label>Proyecto</label>
+        <select class="form-select" name="proyectoId" required>
+
+            <option value="">Selecciona un proyecto</option>
+
+            <option th:each="p : ${proyectos}" th:value="${p.id}" th:text="${p.nombre}"
+                th:selected="${p.id.toString() == proyectoId}">
+            </option>
+
+        </select>
+
+        <p>
+            <label>
+                <input type="checkbox" th:field="*{completada}">
+                Completada
+            </label>
+        </p>
+
+        <button class="btn btn-primary" type="submit" th:disabled="${#lists.isEmpty(proyectos)}">Guardar</button>
+
+        <a th:href="@{/tareas}" th:if="${registroId != null}">Cancelar</a>
+
+    </form>
+
+    <hr>
+
+    <h2>Listado de tareas</h2>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Nombre</th>
+                <th>Descripción</th>
+                <th>Proyecto</th>
+                <th>Estado</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr th:each="t : ${tareas}">
+                <td th:text="${t.id}"></td>
+                <td th:text="${t.nombre}"></td>
+                <td th:text="${t.descripcion}"></td>
+                <td th:text="${t.proyecto.nombre}"></td>
+                <td th:text="${t.completada ? 'Completada' : 'Pendiente'}"></td>
+                <td>
+                    <a th:href="@{/tareas/editar/{id}(id=${t.id})}">Editar</a>
+
+                    <form class="d-inline" method="post" th:action="@{/tareas/eliminar/{id}(id=${t.id})}"
+                        onsubmit="return confirm('Se eliminará la tarea, pero no su proyecto. ¿Continuar?');">
+
+                        <button class="btn btn-danger" type="submit">Eliminar</button>
+
+                    </form>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+</body>
+
+</html>
